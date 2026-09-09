@@ -1,0 +1,47 @@
+#include <stdlib.h>
+
+int compare(const void *a, const void *b)
+{
+    int *x = *(int **)a;
+    int *y = *(int **)b;
+
+    return x[0] - y[0];
+}
+
+int** merge(int** intervals, int intervalsSize, int* intervalsColSize,
+            int* returnSize, int** returnColumnSizes)
+{
+    qsort(intervals, intervalsSize, sizeof(int *), compare);
+
+    int **ans = (int **)malloc(intervalsSize * sizeof(int *));
+    *returnColumnSizes = (int *)malloc(intervalsSize * sizeof(int));
+
+    int k = 0;
+
+    ans[k] = (int *)malloc(2 * sizeof(int));
+    ans[k][0] = intervals[0][0];
+    ans[k][1] = intervals[0][1];
+    (*returnColumnSizes)[k] = 2;
+    k++;
+
+    for (int i = 1; i < intervalsSize; i++)
+    {
+        // Overlap
+        if (intervals[i][0] <= ans[k - 1][1])
+        {
+            if (intervals[i][1] > ans[k - 1][1])
+                ans[k - 1][1] = intervals[i][1];
+        }
+        else
+        {
+            ans[k] = (int *)malloc(2 * sizeof(int));
+            ans[k][0] = intervals[i][0];
+            ans[k][1] = intervals[i][1];
+            (*returnColumnSizes)[k] = 2;
+            k++;
+        }
+    }
+
+    *returnSize = k;
+    return ans;
+}
